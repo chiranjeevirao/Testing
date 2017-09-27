@@ -5,10 +5,16 @@
 	<title>Home</title>
 </head>
 <body>
-<h1>
-	Hello world!  
-</h1>
+<P> Time: ${serverTime}. </P>
 
-<P>  The time on the server is ${serverTime}. </P>
+<div>
+<h2>Welcome to Happy Searching</h2></div>
+<div>
+<form action="search" style="text-align: center;">
+<input type="text" name="searchfor">
+<br><input type="submit">
+</form>
+</div>
+
 </body>
 </html>
