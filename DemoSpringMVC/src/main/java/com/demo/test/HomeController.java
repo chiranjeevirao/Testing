@@ -15,6 +15,7 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +67,31 @@ public class HomeController {
 		searchSourceBuilder.query(QueryBuilders.wildcardQuery("_all", txt));
 		searchSourceBuilder.fetchSource(include, exclude);
 		
+		
+
+		HighlightBuilder highlightBuilder = new HighlightBuilder(); 
+		HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("title").postTags("<b>")
+		        .preTags("</b>"); 
+		highlightTitle.highlighterType("unified");  
+		highlightBuilder.field(highlightTitle);  
+		HighlightBuilder.Field highlightUser = new HighlightBuilder.Field("deptname").postTags("<b>")
+		        .preTags("</b>");
+		highlightBuilder.field(highlightUser);
+		searchSourceBuilder.highlighter(highlightBuilder);
+		
+		
 		SearchRequest searchRequest= new SearchRequest("bottle");
 		//searchRequest.types("books");
 		searchRequest.source(searchSourceBuilder);
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		SearchResponse searchResponse = null;
 		try {
@@ -80,13 +103,18 @@ public class HomeController {
 			return "searchresult"; 
 		}
 		
+		System.out.println("Raw Response----- >>> "+searchResponse.toString());
+		
+		
+		
 		 SearchHit[] searchHits = searchResponse.getHits().getHits();
+		
 		    StringBuilder builder = new StringBuilder();
 		    int length = searchHits.length;
 		    builder.append("[");
 		    for (int i = 0; i < length; i++) {
 		        if (i == length - 1) {
-		            builder.append(searchHits[i].getSourceAsString());
+		        	    	builder.append(searchHits[i].getSourceAsString());
 		        } else {
 		            builder.append(searchHits[i].getSourceAsString());
 		            builder.append(",");
