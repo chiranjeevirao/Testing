@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.apache.lucene.queryparser.xml.QueryBuilderFactory;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -21,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,24 +59,14 @@ public class HomeController {
 		String[] include = new String[] {"*"};
 		String[] exclude = new String[] {"@timestamp","@version"};
 		
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
 		
-		searchSourceBuilder.query(QueryBuilders.wildcardQuery("_all", txt));
+		
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
+		searchSourceBuilder.query(QueryBuilders.matchQuery("_all", txt));
+		/*searchSourceBuilder.query(QueryBuilders.wildcardQuery("_all", txt));*/
 		searchSourceBuilder.fetchSource(include, exclude);
 		
-		
-
-		HighlightBuilder highlightBuilder = new HighlightBuilder(); 
-		HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("title").postTags("<b>")
-		        .preTags("</b>"); 
-		highlightTitle.highlighterType("unified");  
-		highlightBuilder.field(highlightTitle);  
-		HighlightBuilder.Field highlightUser = new HighlightBuilder.Field("deptname").postTags("<b>")
-		        .preTags("</b>");
-		highlightBuilder.field(highlightUser);
-		searchSourceBuilder.highlighter(highlightBuilder);
-		
-		
+			
 		SearchRequest searchRequest= new SearchRequest("bottle");
 		//searchRequest.types("books");
 		searchRequest.source(searchSourceBuilder);
@@ -108,6 +95,17 @@ public class HomeController {
 		
 		
 		 SearchHit[] searchHits = searchResponse.getHits().getHits();
+		 
+		  /* System.out.println("Current results: " + searchHits.length);
+	        for (SearchHit hit : searchHits) {
+	            System.out.println("------------------------------");
+	            Map<String,Object> result = hit.getSource();
+	            System.out.println("------->"+result);
+	        }
+		 */
+		 
+		 
+		 
 		
 		    StringBuilder builder = new StringBuilder();
 		    int length = searchHits.length;
